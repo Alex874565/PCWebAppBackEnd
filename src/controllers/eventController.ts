@@ -1,26 +1,28 @@
 const Event = require('../models/eventModel');
+import { Request, Response } from 'express';
 
-exports.getEvents = async (req, res) => {
+async function getEvents (req : Request, res : Response){
   try {
-    const events = await Event.find();
+    const events = await Event.Event.find();
     res.json(events);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 };
 
-exports.createEvent = async (req, res) => {
-  const event = new Event({
+async function createEvent (req : Request, res : Response){
+  const event = new Event.Event({
     name: req.body.name,
     description: req.body.description,
-    date: req.body.date,
     location: req.body.location,
   });
 
   try {
     const newEvent = await event.save();
     res.status(201).json(newEvent);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
 };
+
+export = { getEvents, createEvent }
