@@ -32,6 +32,20 @@ function loginUser(req : Request, res : Response){
     )
 }
 
+function authGoogle(req : Request, res : Response){
+    const {name, email, password} = req.body;
+    if(password != undefined && password != ""){
+        UserModel.User.updateOne({email : email}, {email : email, password : password, name: name, role : "Client" }, {upsert: true, new: true}, function (err : any, result : any){
+            if(err){
+                return res.status(400).json({message: err.message})
+            }
+            return res.status(200).json(result)
+        })
+    }else{
+        return res.status(400).json({message: "Password not provided"})
+    }
+}
+
 function registerUser(req : Request, res : Response){
     const email = req.body.email;
     UserModel.User.findOne({email:email}).then(
@@ -102,4 +116,4 @@ function authAdminPrivileges(req : Request, res : Response, next : NextFunction)
     })
 }
 
-export = { generateAccessToken, authClientPrivileges, authAdminPrivileges, authDistributorPrivileges, loginUser, registerUser }
+export = { generateAccessToken, authClientPrivileges, authAdminPrivileges, authDistributorPrivileges, loginUser, registerUser, authGoogle }

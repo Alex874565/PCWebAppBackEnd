@@ -1,5 +1,6 @@
 import usersRoutes from "./routes/userRoutes";
 
+const cors = require('cors');
 const express = require('express');
 const database = require('./config/database');
 const eventRoutes = require('./routes/eventRoutes');
@@ -8,6 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use('/api/events', eventRoutes.router);
 app.use('/api/products', productRoutes.router);
