@@ -3,6 +3,34 @@ const UserModel = require('../models/userModel')
 const UserController = require('../controllers/userController')
 
 const jwt = require('jsonwebtoken')
+var nodemailer = require('nodemailer');
+
+function mailCode(req : Request, res : Response){
+    const {email, code} = req.body;
+    const transporter = nodemailer.createTransport({
+        port: 465,
+        host: "smtp.gmail.com",
+           auth: {
+                user: process.env.HOST_EMAIL,
+                pass: process.env.HOST_PASSWORD
+             },
+        secure: true,
+        });
+
+    const mailData = {
+        from: 'love4games@gmail.com',
+        to: email,
+        subject: 'Love4Games Verification Code',
+        text: code.toString()
+        };
+
+    transporter.sendMail(mailData, function (err : any, info : any) {
+        if(err)
+            res.status(400).json({message: err.message})
+        else
+            res.status(200).json(info)
+        });
+}
 
 function loginUser(req : Request, res : Response){
     const email = req.body.email;
@@ -13,21 +41,21 @@ function loginUser(req : Request, res : Response){
                 const res = await user.validatePassword(password)
                 return [res, user.password, user.role]
             }else{
+                res.status(401).json({message: "Wrong email"})
                 return "Wrong email"
             }
         }).then(
-            function (response : any) {
+            async function (response : any) {
                 const [valid_pass, password, role] = response
                 if (valid_pass == true){
+                    const user = await UserModel.User.findOne({email: email}, 'name role _id');
                     const token = generateAccessToken(email, password, role);
-                    res.status(200).json({token : token});   
+                    res.status(200).json({user: user, token : token});   
                 }else if (valid_pass == false){
-                    res.status(403).json({message: "Wrong pasword"});
-                }else{
-                    res.status(400).json({message: valid_pass})
+                    res.status(401).json({message: "Wrong pasword"});
                 }
         }).catch(function(err : any) {
-            res.send({error: err.message})
+            res.status(400).json({message: err.message})
         }
     )
 }
@@ -57,6 +85,14 @@ function registerUser(req : Request, res : Response){
             }
         }
     )
+}
+
+function checkEmail(req : Request, res : Response){
+    const email = req.body.email;
+    UserModel.User.count({email : email}, function(err : any, count : any){
+        if (err) { res.status(400).json({message: err.message}) }
+        res.status(200).json(count)
+    })
 }
 
 function generateAccessToken(email : string, password : string, role : string){
@@ -116,4 +152,4 @@ function authAdminPrivileges(req : Request, res : Response, next : NextFunction)
     })
 }
 
-export = { generateAccessToken, authClientPrivileges, authAdminPrivileges, authDistributorPrivileges, loginUser, registerUser, authGoogle }
+export = { generateAccessToken, authClientPrivileges, authAdminPrivileges, authDistributorPrivileges, loginUser, registerUser, authGoogle, mailCode, checkEmail }
