@@ -60,19 +60,41 @@ function loginUser(req : Request, res : Response){
     )
 }
 
+// function authGoogle(req : Request, res : Response){
+//     const {name, email, password} = req.body;
+//     if(password != undefined && password != ""){
+//         UserModel.User.updateOne({email : email}, {email : email, password : password, name: name, role : "Client" }, {upsert: true, new: true}, function (err : any, result : any){
+//             if(err){
+//                 return res.status(400).json({message: err.message})
+//             }
+//             return res.status(200).json(result)
+//         })
+//     }else{
+//         return res.status(400).json({message: "Password not provided"})
+//     }
+// }
+
 function authGoogle(req : Request, res : Response){
     const {name, email, password} = req.body;
     if(password != undefined && password != ""){
-        UserModel.User.updateOne({email : email}, {email : email, password : password, name: name, role : "Client" }, {upsert: true, new: true}, function (err : any, result : any){
-            if(err){
-                return res.status(400).json({message: err.message})
-            }
-            return res.status(200).json(result)
-        })
+        UserModel.User.findOne({email : email}).then(async function (user : any){
+            if(!user){
+                user = new UserModel.User({
+                    name: name,
+                    email: email,
+                    password: password,
+                    role: "Client"
+                  });
+                    await user.save();
+                }
+            const token = await generateAccessToken(user.email, user.password, user.role)
+            res.status(200).json({user: {_id: user._id, name: user.name, role: user.role}, token: token})
+        }).catch((err : any) => res.status(400).json({message: err.message}))
     }else{
         return res.status(400).json({message: "Password not provided"})
     }
 }
+
 
 function registerUser(req : Request, res : Response){
     const email = req.body.email;
