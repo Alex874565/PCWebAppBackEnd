@@ -11,6 +11,17 @@ async function getProducts (req : Request, res : Response){
   }
 };
 
+async function getProductsByKeyword (req : Request, res : Response){
+  try {
+    const keyword = req.params.keyword
+    const regex = new RegExp(keyword, 'i')
+    const products = await ProductModel.Product.find({name: {$regex: regex}});
+    res.json(products);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 async function createProduct (req : Request, res : Response){
   const {name, description, launch_date, genre, producer, price, stock} = req.body
   const product = new ProductModel.Product({
@@ -44,4 +55,4 @@ async function deleteProduct(req : Request, res : Response){
     }
 }
 
-export = { getProducts, createProduct, updateProduct, deleteProduct }
+export = { getProducts, createProduct, updateProduct, deleteProduct, getProductsByKeyword }
