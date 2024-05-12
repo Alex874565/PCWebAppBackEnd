@@ -16,6 +16,7 @@ const productSchema = new mongoose.Schema({
   image: {
     type: String,
     required: false,
+    default: "https://th.bing.com/th/id/OIP.MvgjeMBHxcKil9_H4jQcvgAAAA?rs=1&pid=ImgDetMain"
   },
   genre: {
     type: String,
