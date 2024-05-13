@@ -1,8 +1,6 @@
 import { Schema } from "mongoose";
 
 const mongoose = require('mongoose');
-const UserModel = require('./userModel');
-const ProductModel = require('./productModel')
 
 const orderSchema = new mongoose.Schema({
   user_id: {
