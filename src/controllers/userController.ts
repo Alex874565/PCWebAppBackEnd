@@ -44,7 +44,7 @@ async function updateUser(req : Request, res : Response){
 
 async function deleteUser(req : Request, res : Response){
     try{
-        const resp = await UserModel.User.findById(new mongoose.Types.ObjectId(req.body.id)).remove();
+        const resp = await UserModel.User.findById(new mongoose.Types.ObjectId(req.params.id)).remove();
         res.status(200).json(resp);
     }catch(err : any){
         res.status(400).json({message : err.message});
