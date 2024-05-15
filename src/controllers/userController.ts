@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt')
 async function getUsers (req : Request, res : Response){
   try {
     const users = await UserModel.User.find(req.query, 'name role _id');
-    res.json(users);
+    res.status(200).json(users);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }

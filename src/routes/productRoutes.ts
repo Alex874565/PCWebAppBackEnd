@@ -5,7 +5,7 @@ const authController = require('../controllers/authController');
 
 
 router.get('/', productController.getProducts)
-router.get('/keyword/:keyword', productController.getProductsByKeyword)
+router.get('/keyword/:keyword?', productController.getProductsByKeyword)
 router.post('/', authController.authDistributorPrivileges, productController.createProduct)
 router.put('/:id', authController.authDistributorPrivileges, productController.updateProduct)
 router.delete('/:id', authController.authDistributorPrivileges, productController.deleteProduct)

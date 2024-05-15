@@ -15,7 +15,7 @@ async function getProductsByKeyword (req : Request, res : Response){
   try {
     const keyword = req.params.keyword
     const regex = new RegExp(keyword, 'i')
-    const products = await ProductModel.Product.find({name: {$regex: regex}});
+    const products = await ProductModel.Product.find({name: {$regex: regex}}, '-_id');
     res.json(products);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
